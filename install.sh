@@ -58,7 +58,17 @@ print(val)
 
 _SELF="$(cd "$(dirname "$0")" 2>/dev/null && pwd)/$(basename "$0")"
 
-if [[ -f "${_SELF}" ]] && command -v curl >/dev/null 2>&1; then
+# Skip auto-update if inside a git repo with uncommitted changes.
+_GIT_DIRTY=false
+if command -v git >/dev/null 2>&1 && git -C "$(dirname "${_SELF}")" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    if ! git -C "$(dirname "${_SELF}")" diff --quiet 2>/dev/null || \
+       ! git -C "$(dirname "${_SELF}")" diff --cached --quiet 2>/dev/null; then
+        _GIT_DIRTY=true
+        _warn "Uncommitted changes detected — skipping auto-update to avoid overwriting local edits."
+    fi
+fi
+
+if [[ "${_GIT_DIRTY}" == "false" ]] && [[ -f "${_SELF}" ]] && command -v curl >/dev/null 2>&1; then
     _UPDATE_TMP=$(mktemp)
     if curl -fsSL -o "${_UPDATE_TMP}" "${CPK_INSTALLER_URL}" 2>/dev/null; then
         if ! cmp -s "${_SELF}" "${_UPDATE_TMP}"; then
