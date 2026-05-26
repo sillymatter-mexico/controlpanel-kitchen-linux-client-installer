@@ -1,1 +1,0 @@
-"ControlPanel Kitchen CLI."
