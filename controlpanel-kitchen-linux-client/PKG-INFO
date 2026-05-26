@@ -1,0 +1,77 @@
+Metadata-Version: 2.3
+Name: controlpanel-kitchen-linux-client
+Version: 0.1.3
+Summary: Async Python client for the ControlPanel Kitchen API
+Author: Your Name
+Author-email: you@example.com
+Requires-Python: >=3.12,<4.0
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Requires-Dist: Pillow (>=10.0)
+Requires-Dist: aiosqlite (>=0.22.1,<0.23.0)
+Requires-Dist: alembic (>=1.18.4,<2.0.0)
+Requires-Dist: httpx (>=0.27,<0.28)
+Requires-Dist: pydantic (>=2.7,<3.0)
+Requires-Dist: pydantic-settings (>=2.3,<3.0)
+Requires-Dist: pystray (>=0.19)
+Requires-Dist: sqlalchemy[asyncio] (>=2.0)
+Requires-Dist: typer (>=0.25.1,<0.26.0)
+Requires-Dist: websockets (>=12.0)
+Description-Content-Type: text/markdown
+
+# controlpanel-kitchen-linux-client
+
+Async Python client for the [ControlPanel Kitchen](https://api.controlpanel.kitchen) API.
+
+## Requirements
+
+- Python 3.12+
+- [Poetry](https://python-poetry.org/)
+
+## Setup
+
+```bash
+make install
+```
+
+## Usage
+
+```python
+import asyncio
+from controlpanel_kitchen_api import ControlPanelKitchenClient
+
+async def main():
+    # Login to obtain a token
+    async with ControlPanelKitchenClient() as client:
+        login = await client.auth.login("user@example.com", "password")
+
+    # Use the token for subsequent requests
+    async with ControlPanelKitchenClient(token=login.token) as client:
+        me = await client.auth.me()
+        collectors = await client.collectors.list()
+        print(me, collectors)
+
+asyncio.run(main())
+```
+
+Environment variables (prefix `CPK_`):
+
+| Variable | Default |
+|---|---|
+| `CPK_TOKEN` | *(none)* |
+| `CPK_BASE_URL` | `https://api.controlpanel.kitchen` |
+| `CPK_TIMEOUT` | `30.0` |
+| `CPK_ORGANIZATION_HOST` | *(none)* |
+
+## Development
+
+```bash
+make test          # run tests
+make lint          # ruff check
+make format        # ruff format
+
+# Regenerate Pydantic models from the live OpenAPI schema:
+make generate-schemas
+```
+
