@@ -22,6 +22,7 @@ readonly CPK_API="https://api.controlpanel.kitchen"
 readonly CPK_APP_NAME="python-linux-client"
 readonly CPK_CREDENTIALS_DIR="${HOME}/.cpk"
 readonly CPK_CREDENTIALS_FILE="${CPK_CREDENTIALS_DIR}/credentials.json"
+readonly CPK_INSTALLER_URL="https://raw.githubusercontent.com/sillymatter-mexico/controlpanel-kitchen-linux-client-installer/main/install.sh"
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -50,6 +51,29 @@ if val is None:
 print(val)
 " "$json" "$field"
 }
+
+# ---------------------------------------------------------------------------
+# Self-update
+# ---------------------------------------------------------------------------
+
+_SELF="$(cd "$(dirname "$0")" 2>/dev/null && pwd)/$(basename "$0")"
+
+if [[ -f "${_SELF}" ]] && command -v curl >/dev/null 2>&1; then
+    _UPDATE_TMP=$(mktemp)
+    if curl -fsSL -o "${_UPDATE_TMP}" "${CPK_INSTALLER_URL}" 2>/dev/null; then
+        if ! cmp -s "${_SELF}" "${_UPDATE_TMP}"; then
+            _info "Installer update available — applying…"
+            chmod +x "${_UPDATE_TMP}"
+            cp "${_UPDATE_TMP}" "${_SELF}"
+            rm -f "${_UPDATE_TMP}"
+            _info "Update applied. Re-running…"
+            exec "${_SELF}" "$@"
+        fi
+    else
+        _warn "Could not check for installer updates (continuing with current version)."
+    fi
+    rm -f "${_UPDATE_TMP}"
+fi
 
 # ---------------------------------------------------------------------------
 # Dependency check
