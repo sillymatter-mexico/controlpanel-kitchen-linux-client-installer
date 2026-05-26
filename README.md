@@ -39,15 +39,3 @@ cpk update check     # check for updates
 ```
 
 Credentials are stored at `~/.cpk/credentials.json` (mode `0600`).
-
----
-
-## Repository layout
-
-```
-install.sh                          # public installer (this is what the one-liner runs)
-controlpanel-kitchen-linux-client/  # Python package source + inner installer
-    install.sh                      # invoked by the outer installer after extracting the release
-    pyproject.toml
-    ...
-```
