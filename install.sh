@@ -304,17 +304,22 @@ fi
 # ---------------------------------------------------------------------------
 
 INSTALL_DIR="${PWD}/controlpanel-kitchen-linux-client"
+
+if [[ -d "${INSTALL_DIR}" ]]; then
+    _info "Removing existing installation directory…"
+    rm -rf "${INSTALL_DIR}"
+fi
 mkdir -p "${INSTALL_DIR}"
 
 _info "Extracting archive to ${INSTALL_DIR}…"
 tar -xzf "${ARCHIVE_PATH}" --strip-components=1 -C "${INSTALL_DIR}"
 
 # ---------------------------------------------------------------------------
-# Run make install
+# Run install.sh
 # ---------------------------------------------------------------------------
 
-_info "Running 'make install' in ${INSTALL_DIR}…"
-(cd "${INSTALL_DIR}" && make install)
+_info "Running 'install.sh' in ${INSTALL_DIR}…"
+(cd "${INSTALL_DIR}" && bash install.sh)
 
 _info "Installation complete."
 printf '\nYou can now start the CPK agent. Token is stored at %s\n' "${CPK_CREDENTIALS_FILE}"
